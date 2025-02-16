@@ -22,8 +22,8 @@ const ProductCard = (props) => {
       {/* Product Image */}
       <Box
         component="img"
-        src="https://cdn.thewirecutter.com/wp-content/media/2023/04/tv-buying-guide-2048px-0032.jpg?auto=webp&quality=75&width=1024"
-        alt="TV"
+        src={props.image}
+        alt={props.name}
         sx={{ width: "100%", height: 300, objectFit: "cover" }}
       />
 

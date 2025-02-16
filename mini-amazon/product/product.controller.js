@@ -86,7 +86,6 @@ router.delete(
     const productId = req.params.id;
 
     // find product
-    // const product = await ProductTable.findOne({ _id: productId });
     const product = await ProductTable.findById(productId);
 
     if (!product) {
@@ -94,7 +93,6 @@ router.delete(
     }
 
     await ProductTable.findByIdAndDelete(productId);
-    // await ProductTable.deleteOne({ _id: productId });
 
     return res
       .status(200)
@@ -215,6 +213,8 @@ router.put(
           price: newValues.price,
           quantity: newValues.quantity,
           category: newValues.category,
+          image: newValues.image,
+          description: newValues.description,
         },
       }
     );

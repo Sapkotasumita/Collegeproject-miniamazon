@@ -16,7 +16,7 @@ import { Link, useNavigate } from "react-router";
 import * as yup from "yup";
 import axiosInstance from "../../lib/axios.instance";
 import { successNotification } from "../../utils/notification";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -25,9 +25,10 @@ const Register = () => {
   const registerUser = async (values) => {
     try {
       const res = await axiosInstance.post("/user/register", values);
-      successNotification("User is registered successfully");
 
       navigate("/login");
+
+      toast.success(res?.data?.message);
     } catch (error) {
       console.log("Register user error...");
       console.log(error);

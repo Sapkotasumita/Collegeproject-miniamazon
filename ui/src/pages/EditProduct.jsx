@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   FormControl,
   FormHelperText,
   InputLabel,
@@ -9,8 +10,10 @@ import {
   Typography,
 } from "@mui/material";
 import { Formik } from "formik";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router";
 import * as yup from "yup";
+import axiosInstance from "../../lib/axios.instance";
 
 const categoryList = [
   "grocery",
@@ -22,16 +25,53 @@ const categoryList = [
   "laundry",
 ];
 const EditProduct = () => {
+  const params = useParams();
+  const productId = params.id;
+  const [productDetails, setProductDetails] = useState({});
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const getProductDetails = async () => {
+      try {
+        setLoading(true);
+        const res = await axiosInstance.get(`/product/detail/${productId}`);
+
+        setProductDetails(res?.data?.productDetails);
+      } catch (error) {
+        console.log("Fetch product api from edit product page failed...");
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getProductDetails();
+  }, []);
+
+  const editProduct = async (values) => {
+    try {
+      const res = await axiosInstance.put(`/product/edit/${productId}`, values);
+      navigate(`/product-detail/${productId}`);
+    } catch (error) {
+      console.log("Edit product api hit failed....");
+      console.log(error);
+    }
+  };
+
+  if (loading) {
+    return <CircularProgress />;
+  }
   return (
     <Formik
       initialValues={{
-        name: "",
-        brand: "",
-        price: 0,
-        quantity: 1,
-        category: "",
+        name: productDetails?.name || "",
+        brand: productDetails.brand || "",
+        price: productDetails?.price || 0,
+        quantity: productDetails?.quantity || 1,
+        category: productDetails?.category || "",
         image: "",
-        description: "",
+        description: productDetails?.description || "",
       }}
       validationSchema={yup.object({
         name: yup.string().required("Name is required.").trim().max(155),
@@ -43,7 +83,7 @@ const EditProduct = () => {
         image: yup.string().notRequired().trim(),
       })}
       onSubmit={(values) => {
-        console.log(values);
+        editProduct(values);
       }}
     >
       {(formik) => {
@@ -56,13 +96,17 @@ const EditProduct = () => {
               justifyContent: "center",
               alignItems: "center",
               gap: "2rem",
-              width: 410,
+              width: "430px",
               boxShadow:
                 "rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px",
               padding: "1rem",
             }}
           >
             <Typography variant="h5">Edit Product</Typography>
+
+            {productDetails?.image && (
+              <img src={productDetails.image} width={"100%"} height={250} />
+            )}
 
             <FormControl fullWidth>
               <TextField
@@ -147,7 +191,7 @@ const EditProduct = () => {
               ) : null}
             </FormControl>
 
-            <Button fullWidth variant="contained" color="warning" type="submit">
+            <Button fullWidth variant="contained" color="success" type="submit">
               submit
             </Button>
           </form>

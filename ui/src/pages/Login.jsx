@@ -13,6 +13,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import * as yup from "yup";
 import axiosInstance from "../../lib/axios.instance";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -44,10 +45,11 @@ const Login = () => {
             const accessToken = res.data?.accessToken;
 
             localStorage.setItem("accessToken", accessToken);
-            console.log(res);
+            toast.success("You are logged in successfully.");
           } catch (error) {
             console.log("Login user api hit failed...");
             console.log(error);
+            toast.error(error?.response?.data?.message);
           } finally {
             setLoading(false);
           }

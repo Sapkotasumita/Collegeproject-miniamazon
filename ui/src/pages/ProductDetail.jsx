@@ -7,10 +7,10 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import { useNavigate, useParams } from "react-router";
 import axiosInstance from "../../lib/axios.instance";
+import DeleteProductDialog from "../components/DeleteProductDialog";
 const ProductDetail = () => {
   const params = useParams();
   const [productDetails, setProductDetails] = useState({});
@@ -18,18 +18,6 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const [deleteLoading, setDeleteLoading] = useState(false);
 
-  const deleteProduct = async () => {
-    try {
-      setDeleteLoading(true);
-      await axiosInstance.delete(`/product/delete/${params.id}`);
-      navigate("/");
-    } catch (error) {
-      console.log("Delete product api hit failed...");
-      console.log(error);
-    } finally {
-      setDeleteLoading(false);
-    }
-  };
   useEffect(() => {
     const getProductDetails = async () => {
       try {
@@ -60,21 +48,29 @@ const ProductDetail = () => {
           md: "row",
         },
         justifyContent: "center",
-        alignItems: "flex-start",
+        alignItems: "center",
         padding: "1rem",
         gap: "3rem",
-        margin: "3rem",
-        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+        margin: {
+          xs: "none",
+          md: "3rem",
+        },
+        boxShadow: {
+          xs: "none",
+          sm: "none",
+          md: "rgba(0, 0, 0, 0.24) 0px 3px 8px",
+        },
       }}
     >
-      <Box>
+      <Box sx={{ background: "red" }}>
         <img
           src={
             productDetails?.image ||
             "https://cdn.thewirecutter.com/wp-content/media/2023/04/tv-buying-guide-2048px-0032.jpg?auto=webp&quality=75&width=1024"
           }
           alt={productDetails.name}
-          height={"500px"}
+          height={"100%"}
+          width={"100%"}
         />
       </Box>
 
@@ -113,9 +109,6 @@ const ProductDetail = () => {
             fontSize: "1.2rem",
           }}
         >
-          <Typography variant="h6">
-            description:{productDetails.description}
-          </Typography>
           {productDetails.description}
         </Typography>
 
@@ -125,19 +118,18 @@ const ProductDetail = () => {
             gap: "2rem",
           }}
         >
-          <Button variant="contained" color="success" startIcon={<EditIcon />}>
-            Edit
-          </Button>
           <Button
             variant="contained"
-            color="error"
-            startIcon={<DeleteOutlineIcon />}
+            color="success"
+            startIcon={<EditIcon />}
             onClick={() => {
-              deleteProduct();
+              navigate(`/edit-product/${params.id}`);
             }}
           >
-            Delete
+            Edit
           </Button>
+
+          <DeleteProductDialog />
         </Box>
       </Stack>
     </Box>
